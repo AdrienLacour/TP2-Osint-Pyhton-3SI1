@@ -1,1 +1,2 @@
-shodanapikey:54ydNxUGssVLo45qISVfXHNrffjpAEGb
+shodanapikey:"Entrez_votre_APIKey_shodan"
+urlscanapikey:"Entrez_votre_APYKey_urlscan"
