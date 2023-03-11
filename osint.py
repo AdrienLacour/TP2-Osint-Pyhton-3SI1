@@ -145,7 +145,7 @@ def execute_scripts():
         result_label.config(text="Aucun domaine saisi.")
         return
     # Vérifier si les clés API ont été chargées avec succès
-    if not shodanapikey:
+    if not shodanapikey or not urlscanapikey:
         print("Erreur lors du chargement des clés API depuis le fichier apikey.txt")
         exit(1)
     # Effacer le texte dans la zone de saisie
