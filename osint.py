@@ -28,7 +28,8 @@ def open_apikey_file():
 # Lecture des clés API depuis le fichier apikey.txt
 shodanapikey = ''
 urlscanapikey = ''
-
+googleapikey = ''
+searchidengine = ''
 with open('apikey.txt') as f:
     for line in f:
         key, value = line.strip().split(':')
@@ -36,6 +37,10 @@ with open('apikey.txt') as f:
             shodanapikey = value
         elif key == 'urlscanapikey':
             urlscanapikey = value
+        elif key == 'googleapikey':
+            googleapikey = value
+        elif key == 'searchidengine':
+            searchidengine = value    
             
 def get_domain():
     global domain, results_dir
@@ -145,7 +150,7 @@ def execute_scripts():
         result_label.config(text="Aucun domaine saisi.")
         return
     # Vérifier si les clés API ont été chargées avec succès
-    if not shodanapikey or not urlscanapikey:
+    if not shodanapikey or not urlscanapikey or not googleapikey or not searchidengine:
         print("Erreur lors du chargement des clés API depuis le fichier apikey.txt")
         exit(1)
     # Effacer le texte dans la zone de saisie
@@ -165,7 +170,7 @@ def execute_scripts():
         subprocess.run(['python.exe', 'scriptharvester.py', domain, results_dir])
 
     if script5_var.get():
-        subprocess.run(['python.exe', 'dorks.py', domain, results_dir])
+        subprocess.run(['python.exe', 'dorks.py', domain, results_dir, googleapikey, searchidengine])
 
     result_label.config(text="Les résultats ont été enregistrés dans le dossier " + domain)
 

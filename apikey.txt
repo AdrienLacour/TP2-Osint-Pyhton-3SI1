@@ -1,2 +1,4 @@
 shodanapikey:"Entrez_votre_APIKey_shodan"
-urlscanapikey:"Entrez_votre_APYKey_urlscan"
+urlscanapikey:"Entrez_votre_APIKey_urlscan"
+googleapikey:"Entrez votre APIKey_google"
+searchidengine:"Entrez votre id de moteur de recherche créé"
