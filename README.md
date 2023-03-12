@@ -4,14 +4,18 @@ Adrien LACOUR et Mariam CISSE
 Installer le requirements.txt avec la commande: pip install -r requirements.txt
 
 Afin de faire fonctionner le script pour Google dorks, urlscan et shodan, il faut:
-Pour urlscan: Insérer la clé API dans apikey.txt créée sur urlscan.io
-Pour shodan: Insérer la clé API dans apikey.txt créée sur le site officiel shodan.io
-Pour Google dorks:
-Pour obtenir les clés nécessaires à l'utilisation de l'API de recherche Google, vous devez suivre ces étapes :
+Pour urlscan: 
+	Insérer la clé API dans apikey.txt créée sur urlscan.io
 
-    Créez un compte Google si vous n'en avez pas déjà un.
-    Accédez à la page Google Developers Console.
-    Cliquez sur "Select a Project" (Sélectionner un projet) en haut de la page, puis cliquez sur "New Project" (Nouveau projet).
+Pour shodan: 
+	Insérer la clé API dans apikey.txt créée sur le site officiel shodan.io
+
+Pour Google dorks:
+	Pour obtenir les clés nécessaires à l'utilisation de l'API de recherche Google, vous devez suivre ces étapes :
+
+	Créez un compte Google si vous n'en avez pas déjà un.
+    	Accédez à la page Google Developers Console.
+    	Cliquez sur "Select a Project" (Sélectionner un projet) en haut de la page, puis cliquez sur "New Project" (Nouveau projet).
     Donnez un nom à votre projet et cliquez sur "Create" (Créer).
     Dans le menu de gauche, cliquez sur "Credentials" (Identifiants).
     Cliquez sur le bouton "Create credentials" (Créer des identifiants), puis sélectionnez "API Key" (Clé d'API).
