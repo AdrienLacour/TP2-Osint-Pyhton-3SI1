@@ -1,0 +1,29 @@
+#!/bin/bash
+set -e
+
+source $(dirname $0)/version
+
+cd $(dirname $0)/..
+
+mkdir -p bin
+if [ "$(uname)" = "Linux" ]; then
+    OTHER_LINKFLAGS="-extldflags -static -s"
+fi
+
+LINKFLAGS="-X github.com/harvester/harvester/pkg/version.Version=$VERSION
+           -X github.com/harvester/harvester/pkg/version.GitCommit=$COMMIT
+           -X github.com/harvester/harvester/pkg/settings.InjectDefaults=$DEFAULT_VALUES $LINKFLAGS"
+
+build_binary () {
+    local BINARY="$1"
+    local PKG_PATH="$2"
+
+    CGO_ENABLED=0 go build -ldflags "$LINKFLAGS $OTHER_LINKFLAGS"  -o "bin/${BINARY}" "${PKG_PATH}"
+    if [ "$CROSS" = "true" ] && [ "$ARCH" = "amd64" ]; then
+        GOOS=darwin go build -ldflags "$LINKFLAGS"  -o "bin/${BINARY}-darwin" "${PKG_PATH}"
+        GOOS=windows go build -ldflags "$LINKFLAGS" -o "bin/${BINARY}-windows" "${PKG_PATH}"
+    fi
+}
+
+build_binary "harvester" "."
+build_binary "harvester-webhook" "./cmd/webhook"
