@@ -5,32 +5,32 @@ Installer le requirements.txt avec la commande: pip install -r requirements.txt
 
 Afin de faire fonctionner le script pour Google dorks, urlscan et shodan, il faut:
 Pour urlscan: 
-	InsÈrer la clÈ API dans apikey.txt crÈÈe sur urlscan.io
+	Ins√©rer la cl√© API dans apikey.txt cr√©√©e sur urlscan.io
 
 Pour shodan: 
-	InsÈrer la clÈ API dans apikey.txt crÈÈe sur le site officiel shodan.io
+	Ins√©rer la cl√© API dans apikey.txt cr√©√©e sur le site officiel shodan.io
 
 Pour Google dorks:
-	Pour obtenir les clÈs nÈcessaires ‡ l'utilisation de l'API de recherche Google, vous devez suivre ces Ètapes :
+	Pour obtenir les cl√©s n√©cessaires √† l'utilisation de l'API de recherche Google, vous devez suivre ces √©tapes :
+	-Cr√©ez un compte Google si vous n'en avez pas d√©j√† un.
+    	-Acc√©dez √† la page Google Developers Console.
+    	-Cliquez sur "Select a Project" (S√©lectionner un projet) en haut de la page, puis cliquez sur "New Project" (Nouveau projet).
+    	-Donnez un nom √† votre projet et cliquez sur "Create" (Cr√©er).
+    	-Dans le menu de gauche, cliquez sur "Credentials" (Identifiants).
+    	-Cliquez sur le bouton "Create credentials" (Cr√©er des identifiants), puis s√©lectionnez "API Key" (Cl√© d'API).
+    	-Copiez la cl√© API g√©n√©r√©e.
 
-	CrÈez un compte Google si vous n'en avez pas dÈj‡ un.
-    	AccÈdez ‡ la page Google Developers Console.
-    	Cliquez sur "Select a Project" (SÈlectionner un projet) en haut de la page, puis cliquez sur "New Project" (Nouveau projet).
-    Donnez un nom ‡ votre projet et cliquez sur "Create" (CrÈer).
-    Dans le menu de gauche, cliquez sur "Credentials" (Identifiants).
-    Cliquez sur le bouton "Create credentials" (CrÈer des identifiants), puis sÈlectionnez "API Key" (ClÈ d'API).
-    Copiez la clÈ API gÈnÈrÈe.
+	Pour obtenir l'ID de moteur de recherche personnalis√© :
+    	-Acc√©dez √† la page Google Custom Search Engine.
+    	-Cliquez sur le bouton "Get started" (Commencer).
+    	-Suivez les instructions pour configurer votre moteur de recherche personnalis√©.
+    	-Copiez l'ID de moteur de recherche personnalis√© g√©n√©r√©.
 
-Pour obtenir l'ID de moteur de recherche personnalisÈ :
-    AccÈdez ‡ la page Google Custom Search Engine.
-    Cliquez sur le bouton "Get started" (Commencer).
-    Suivez les instructions pour configurer votre moteur de recherche personnalisÈ.
-    Copiez l'ID de moteur de recherche personnalisÈ gÈnÈrÈ.
-Il faut faire Áa pour que la key fonctionne
-    Assurez-vous que la clÈ d'API Google que vous utilisez est correcte et qu'elle est associÈe au compte Google correct. Vous pouvez vÈrifier cela dans la console de dÈveloppement Google.
-
-    VÈrifiez que votre moteur de recherche personnalisÈ est correctement configurÈ dans la console de dÈveloppement Google et qu'il est associÈ ‡ la clÈ d'API que vous utilisez.
-
-    Essayez d'utiliser un autre moteur de recherche personnalisÈ ou une autre clÈ d'API pour voir si cela rÈsout le problËme.
-
-    VÈrifiez que votre compte Google a bien l'autorisation d'accÈder ‡ l'API de recherche Google.
+	Il faut faire √ßa pour que la cl√© fonctionne:
+    	Pour v√©rifier si votre compte Google dispose de l'API de recherche Google activ√©e, vous pouvez suivre les √©tapes suivantes:
+	-Acc√©dez au site https://console.cloud.google.com/.
+    	-Connectez-vous √† votre compte Google.
+    	-Dans le menu de navigation √† gauche, s√©lectionnez "API et services" -> "Biblioth√®que".
+    	-Dans la barre de recherche, tapez "Custom Search API" et appuyez sur Entr√©e.
+    	-Si l'API est activ√©e, vous devriez voir "Custom Search API" dans la liste des APIs avec un √©tat "Activ√©".
+    	-Si l'API n'est pas activ√©e, cliquez sur le bouton "Activer".
