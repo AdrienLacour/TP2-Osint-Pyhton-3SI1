@@ -1,0 +1,495 @@
+###########################################################################
+###########################################################################
+##                            Installation control                       ##
+###########################################################################
+###########################################################################
+
+## Specify to enable the sub-chart group or not,
+## view more detail from: https://helm.sh/docs/topics/charts/#tags-and-condition-resolution.
+##
+tags:
+
+  ## Specify to enable both KubeVirt operator and KubeVirt sub-charts,
+  ## defaults to "true".
+  ##
+  kubevirt: true
+
+###########################################################################
+###########################################################################
+##          Override the sub-charts default configuration below          ##
+###########################################################################
+###########################################################################
+
+## Specify the parameters to override the sub-chart.
+##
+kubevirt-operator:
+  containers:
+    operator:
+      image:
+        repository: registry.suse.com/suse/sles/15.4/virt-operator
+        tag: &kubevirtVersion 0.54.0-150400.3.7.1
+    ## The following images are placeholder for images in use.
+    ## They are not used by the kubevirt-operator chart.
+    controller:
+      image:
+        repository: registry.suse.com/suse/sles/15.4/virt-controller
+        tag: *kubevirtVersion
+    handler:
+      image:
+        repository: registry.suse.com/suse/sles/15.4/virt-handler
+        tag: *kubevirtVersion
+    api:
+      image:
+        repository: registry.suse.com/suse/sles/15.4/virt-api
+        tag: *kubevirtVersion
+    launcher:
+      image:
+        repository: registry.suse.com/suse/sles/15.4/virt-launcher
+        tag: *kubevirtVersion
+    libguestfs: # introduced from kubevirt v0.44.0
+      image:
+        repository: registry.suse.com/suse/sles/15.4/libguestfs-tools
+        tag: *kubevirtVersion
+
+## Specify the parameters to override the sub-chart.
+##
+kubevirt:
+
+  ## Specify the specification of KubeVirt resource.
+  ##
+  spec:
+
+    ## Specify the default configuration of KubeVirt virtual machine.
+    ##
+    configuration:
+
+      ## Specify kubevirt feature gates
+      developerConfiguration:
+        featureGates: ["LiveMigration", "HotplugVolumes", "HostDevices"]
+
+      ## Specify the network configuration of VirtualMachineInstance.
+      ##
+      network:
+
+        ## Specify the default network interface of VirtualMachineInstance(`spec.domain.devices.interfaces[?(.name="default")]`),
+        ## defaults to "bridge".
+        ##
+        defaultNetworkInterface: "bridge"
+
+        ## Specify to permit slirp interface
+        ## NB(thxCode): we just need to pin it as true,
+        ## and then the user can focus on the above "defaultNetworkInterface".
+        ##
+        permitSlirpInterface: true
+
+        ## Specify to permit bridge interface,
+        ## NB(thxCode): we just need to pin it as true,
+        ## and then the user can focus on the above "defaultNetworkInterface".
+        ##
+        permitBridgeInterfaceOnPodNetwork: true
+
+      ## Specify the machine type regex for validating the emulation of VirtualMachineInstance,
+      ## defaults to discover automatically, "pseries*" if arch is ppc64le, otherwise "q35, pc-g35*, pc, pc-i440fx*".
+      ##
+      emulatedMachines: ["q35","pc-q35*","pc","pc-i440fx*"]
+
+    customizeComponents:
+      patches:
+        - patch: '{"webhooks":[{"name":"kubevirt-validator.kubevirt.io","failurePolicy":"Ignore"},{"name":"kubevirt-update-validator.kubevirt.io","failurePolicy":"Ignore"}]}'
+          resourceName: virt-operator-validator
+          resourceType: ValidatingWebhookConfiguration
+          type: strategic
+        - patch: '{"spec":{"template":{"spec":{"containers":[{"name":"virt-api", "resources":{"limits":{"cpu":"400m","memory":"1100Mi"}}}]}}}}'
+          resourceName: virt-api
+          resourceType: Deployment
+          type: strategic
+        - patch: '{"spec":{"template":{"spec":{"containers":[{"name":"virt-controller", "resources":{"limits":{"cpu":"800m","memory":"1300Mi"}}}]}}}}'
+          resourceName: virt-controller
+          resourceType: Deployment
+          type: strategic
+        - patch: '{"spec":{"template":{"spec":{"containers":[{"name":"virt-handler", "resources":{"limits":{"cpu":"700m","memory":"1600Mi"}}}]}}}}'
+          resourceName: virt-handler
+          resourceType: DaemonSet
+          type: strategic
+
+###########################################################################
+###########################################################################
+##                    Default values for Harvester                       ##
+###########################################################################
+###########################################################################
+
+## Provide a name in place of labels.
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources.
+##
+fullnameOverride: ""
+
+## Specify the replicas of workload.
+##
+replicas: 3
+
+## Specify the security context of workload.
+##
+securityContext: {}
+
+## Specify the node selector of workload.
+##
+nodeSelector: {}
+
+## Specify the tolerations of workload.
+##
+tolerations: []
+#  - key: CriticalAddonsOnly
+#    operator: Exists
+
+## Specify the update strategy of workload.
+##
+strategy:
+  rollingUpdate:
+    maxSurge: 2
+    maxUnavailable: 2
+  type: RollingUpdate
+
+## Specify the parameter of containers.
+##
+containers:
+
+  ## Specify the parameter of harvester-apiserver container.
+  ##
+  apiserver:
+
+    ## Specify the image.
+    ##
+    image:
+
+      ## Specify the pull policy of image.
+      ##
+      imagePullPolicy: Always
+
+      ## Specify the repository of image.
+      ##
+      repository: rancher/harvester
+
+      ## Specify the tag of image.
+      ##
+      tag: master-head
+
+    ## Specify whether to run in HCI mode. This option enables additional controllers.
+    ## defaults to "false", this will be enabled in ISO mode installation.
+    hciMode: false
+
+    ## Specify the command.
+    ##
+    command: []
+
+    ## Specify the args.
+    ##
+    args: []
+
+    ## Specify the env.
+    ##
+    env: []
+    #  - name: OPERATOR_IMAGE
+    #    value: xxx
+
+    ## Specify the liveness probe.
+    ##
+    livenessProbe: {}
+
+    ## Specify the readiness probe.
+    ##
+    readinessProbe: {}
+
+    ## Specify whether to enable the debug flag.
+    ##
+    debug: false
+
+    ## Specify the resources.
+    ##
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+## Specify the service configuration.
+##
+service:
+  ## Specify the configuration of default service,
+  ## which is named "harvester".
+  ##
+  harvester:
+
+    ## Specify as cluster service,
+    ## so this service can be listed with `kubectl cluster-info`.
+    asClusterService: true
+
+    ## Specify the type of service,
+    ## select from [ClusterIP, NodePort, LoadBalancer],
+    ## defaults to "ClusterIP".
+    ##
+    type: ClusterIP
+
+    ## Specify the nodePort of HTTPs endpoint.
+    ## defaults to "30443".
+    ##
+    # httpsNodePort: 30443
+
+    ## Specify the port of HTTPs endpoint.
+    ## defaults to "8443".
+    ##
+    httpsPort: 8443
+
+    ## Specify the port of golang pprof endpoint.
+    ## defaults to "6060".
+    ##
+    profile: 6060
+
+    ## Specify the nodePort of HTTP endpoint.
+    ## defaults to "30080".
+    ##
+    # httpNodePort: 30080
+
+    ## Specify the port of HTTP endpoint,
+    ## this port will be closed if set to 0.
+    ## defaults to "0".
+    ##
+    httpPort: 0
+
+    ## Specify the session affinity,
+    ## defaults to "ClientIP".
+    sessionAffinity: ClientIP
+
+  # specify the vip service configs
+  vip:
+    enabled: false
+
+    ## Specify the VIP service type
+    ## select from [ClusterIP, NodePort, LoadBalancer],
+    type: LoadBalancer
+
+    ## Specify the loadBalancerIP
+    loadBalancerIP: ""
+
+    ## kube-vip annotations help to get the vip
+    ## Specify the mode of vip,
+    ## select from ["dhcp", "static"],
+    ## defaults to "static".
+    mode: "static"
+    ip: ""
+    hwAddress: ""
+
+## Specify the lifecycle jobs.
+##
+jobs:
+
+  ## Specify the pre-delete job.
+  ##
+  preDelete:
+
+    ## Specify to execute pre-delete job,
+    ## defaults to "true".
+    ##
+    enabled: true
+
+    ## Specify the node selector of workload.
+    ##
+    nodeSelector: {}
+
+    ## Specify the tolerations of workload.
+    ##
+    tolerations: []
+    #  - key: CriticalAddonsOnly
+    #    operator: Exists
+
+    ## Specify the backoff limit of workload,
+    ## defaults to "1".
+    ##
+    backoffLimit: 1
+
+    ## Specify the amount of seconds for calculate the active deadline,
+    ## defaults to "900".
+    ##
+    activeDeadlineSeconds: 900
+
+    ## Specify the amount of TTL seconds after finished(Complete/Failed),
+    ## defaults to "10".
+    ##
+    ttlSecondsAfterFinished: 10
+
+    ## Specify the restart policy of workload,
+    ## defaults to "OnFailure".
+    ##
+    restartPolicy: OnFailure
+
+    ## Specify the parameter of containers.
+    ##
+    containers:
+
+      ## Specify the parameter of kubectl action container.
+      ##
+      kubectl:
+
+        ## Specify the image.
+        ##
+        image:
+
+          ## Note we use the harvester-upgrade image. It contains kubectl.
+          ##
+          imagePullPolicy: IfNotPresent
+
+        ## Specify the resources.
+        ##
+        resources:
+          limits:
+            cpu: 250m
+            memory: 128Mi
+          requests:
+            cpu: 250m
+            memory: 128Mi
+
+storageClass:
+  ## Specify the default Storage Class of harvester-longhorn.
+  ## Will be set "false" when upgrading for existing default Storage Class.
+  ## defaults to "true".
+  defaultStorageClass: true
+  reclaimPolicy: Delete
+  replicaCount: 3
+
+harvester-network-controller:
+  ## Specify to install harvester network controller,
+  ## defaults to "false".
+  enabled: true
+  image:
+    repository: rancher/harvester-network-controller
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: master-head
+  helper:
+    image:
+      repository: rancher/harvester-network-helper
+      tag: master-head
+  webhook:
+    image:
+      repository: rancher/harvester-network-webhook
+      pullPolicy: IfNotPresent
+      tag: master-head
+
+harvester-node-disk-manager:
+  ## Specify to install harvester node disk manager,
+  ## defaults to "false".
+  enabled: false
+
+  ## Specify where is longhorn installed.
+  longhornNamespace: longhorn-system
+
+  image:
+    repository: rancher/harvester-node-disk-manager
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: master-head
+
+csi-snapshotter:
+  ## Specify whether to install the csi-snapshotter
+  enabled: true
+
+  image:
+    repository: k8s.gcr.io/sig-storage/snapshot-controller
+    tag: v4.0.0
+
+longhorn:
+  ## Specify whether to install longhorn,
+  ## defaults to "true"
+  enabled: true
+
+  createNamespace: true
+
+  ## Specify the namespace to install longhorn.
+  namespaceOverride: longhorn-system
+
+  ## mark `longhorn` does not be default
+  persistence:
+    defaultClass: false
+    migratable: true
+
+  csi:
+    ## Specify the kubelet root directory.
+    kubeletRootDir: /var/lib/kubelet
+
+  defaultSettings:
+    ## Specify the concurrent automatic engine upgrade per node limit
+    concurrentAutomaticEngineUpgradePerNodeLimit: 3
+
+rancherEmbedded: false
+
+webhook:
+  replicas: 3
+  debug: false
+  image:
+
+    ## Specify the pull policy of image.
+    ##
+    imagePullPolicy: Always
+
+    ## Specify the repository of image.
+    ##
+    repository: rancher/harvester-webhook
+
+    ## Specify the tag of image.
+    ##
+    tag: master-head
+
+  httpsPort: 9443
+
+upgrade:
+  image:
+    repository: rancher/harvester-upgrade
+    tag: master-head
+
+harvester-load-balancer:
+  enabled: false
+  image:
+    imagePullPolicy: Always
+    repository: rancher/harvester-load-balancer
+    tag: master-head
+
+kube-vip:
+  enabled: false
+  image:
+    repository: ghcr.io/kube-vip/kube-vip
+    tag: v0.5.10
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+
+kube-vip-cloud-provider:
+  enabled: false
+  image:
+    repository: kubevip/kube-vip-cloud-provider
+    tag: v0.0.1
+
+support-bundle-kit:
+  image:
+    imagePullPolicy: IfNotPresent
+    repository: rancher/support-bundle-kit
+    tag: master-head
+
+generalJob:
+  image:
+    imagePullPolicy: IfNotPresent
+    repository: registry.suse.com/bci/bci-base
+    tag: 15.4
+
+whereabouts:
+  enabled: true
+  image:
+    pullPolicy: IfNotPresent
+    repository: ghcr.io/k8snetworkplumbingwg/whereabouts
+    tag: "v0.6.1-amd64"
+
+harvester-node-manager:
+  image:
+    imagePullPolicy: IfNotPresent
+    repository: rancher/harvester-node-manager
+    tag: master-head
+

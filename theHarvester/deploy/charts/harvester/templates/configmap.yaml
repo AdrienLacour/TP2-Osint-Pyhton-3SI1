@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vip
+data:
+  enabled: {{ .Values.service.vip.enabled | quote }}
+  serviceType: {{ .Values.service.vip.type }}
+  ip: {{ .Values.service.vip.ip | quote }}
+  mode: {{ .Values.service.vip.mode }}
+  hwAddress: {{ .Values.service.vip.hwAddress | quote }}
+  loadBalancerIP: {{ .Values.service.vip.loadBalancerIP | quote }}
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: harvester-helpers
+  labels:
+{{ include "harvester.labels" . | indent 4 }}
+data:
+  promote.sh: |-
+    {{`KUBECTL="/host/$(readlink /host/var/lib/rancher/rke2/bin)/kubectl"
+
+    get_machine_from_node() {
+      $KUBECTL get node $HARVESTER_PROMOTE_NODE_NAME -o jsonpath='{.metadata.annotations.cluster\.x-k8s\.io/machine}'
+    }
+
+    # Wait for rancher-webhook ready. It's default to one replica.
+    # Otherwise lebeling capi resources later might fail.
+    $KUBECTL rollout status --watch=true deployment rancher-webhook -n cattle-system
+    # https://github.com/rancher/webhook/blob/436e359b136b633cb1a6fa7cdedbed4d74821bdb/pkg/server/server.go#L114
+    sleep 20
+
+    CUSTOM_MACHINE=$(get_machine_from_node)
+    until [ -n "$CUSTOM_MACHINE" ]
+    do
+      echo Waiting for custom machine label of $HARVESTER_PROMOTE_NODE_NAME ...
+      sleep 2
+      CUSTOM_MACHINE=$(get_machine_from_node)
+    done
+
+    until $KUBECTL get machines.cluster.x-k8s.io $CUSTOM_MACHINE -n fleet-local &> /dev/null
+    do
+      echo Waiting for custom machine $CUSTOM_MACHINE...
+      sleep 2
+    done
+
+    PLAN_SECRET="${CUSTOM_MACHINE}-machine-plan"
+    until $KUBECTL get secret $PLAN_SECRET -n fleet-local &> /dev/null
+    do
+      echo Waiting for machine plan of $CUSTOM_MACHINE...
+      sleep 2
+    done
+
+    until $KUBECTL get rkebootstraps.rke.cattle.io "${CUSTOM_MACHINE}" -n fleet-local &> /dev/null
+    do
+      echo Waiting for bootstrap object of $CUSTOM_MACHINE...
+      sleep 2
+    done
+
+    VIP=$($KUBECTL get configmap vip -n harvester-system -o=jsonpath='{.data.ip}')
+    cat > /host/etc/rancher/rke2/config.yaml.d/90-harvester-server.yaml <<EOF
+    cni: multus,canal
+    cluster-cidr: 10.52.0.0/16
+    service-cidr: 10.53.0.0/16
+    cluster-dns: 10.53.0.10
+    tls-san:
+      - $VIP
+    audit-policy-file: /etc/rancher/rke2/config.yaml.d/92-harvester-kube-audit-policy.yaml
+    EOF
+
+    # For how to promote nodes, see: https://github.com/rancher/rancher/issues/36480#issuecomment-1039253499
+    ROLE_LABELS="rke.cattle.io/control-plane-role=true rke.cattle.io/etcd-role=true"
+    $KUBECTL label --overwrite -n fleet-local machines.cluster.x-k8s.io $CUSTOM_MACHINE $ROLE_LABELS
+    $KUBECTL label --overwrite -n fleet-local secret $PLAN_SECRET $ROLE_LABELS
+    $KUBECTL label --overwrite -n fleet-local rkebootstraps.rke.cattle.io $CUSTOM_MACHINE $ROLE_LABELS
+
+    while true
+    do
+      CONTROL_PLANE=$($KUBECTL get node $HOSTNAME -o go-template=$'{{index .metadata.labels "node-role.kubernetes.io/control-plane"}}\n' || true)
+
+      if [ "$CONTROL_PLANE" = "true" ]; then
+        break
+      fi
+      echo Waiting for promotion...
+      sleep 2
+    done
+    `}}

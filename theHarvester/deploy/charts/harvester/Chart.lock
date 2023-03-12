@@ -1,0 +1,36 @@
+dependencies:
+- name: kubevirt-operator
+  repository: file://dependency_charts/kubevirt-operator
+  version: 0.1.0
+- name: kubevirt
+  repository: file://dependency_charts/kubevirt
+  version: 0.1.0
+- name: harvester-network-controller
+  repository: https://charts.harvesterhci.io
+  version: 0.3.2-rc1
+- name: harvester-node-disk-manager
+  repository: https://charts.harvesterhci.io
+  version: 0.4.8
+- name: csi-snapshotter
+  repository: file://dependency_charts/csi-snapshotter
+  version: 0.1.0
+- name: longhorn
+  repository: https://charts.longhorn.io
+  version: 1.3.2
+- name: kube-vip
+  repository: https://kube-vip.github.io/helm-charts
+  version: 0.4.2
+- name: kube-vip-cloud-provider
+  repository: https://kube-vip.github.io/helm-charts
+  version: 0.2.1
+- name: harvester-load-balancer
+  repository: https://charts.harvesterhci.io
+  version: 0.1.4
+- name: whereabouts
+  repository: file://dependency_charts/whereabouts
+  version: 0.1.1
+- name: harvester-node-manager
+  repository: https://charts.harvesterhci.io
+  version: 0.1.3
+digest: sha256:f1e8805591a94f51ea898e4435a97a3b58253269ef24832cc2033b26a801fddf
+generated: "2023-02-16T12:30:22.123101+08:00"
